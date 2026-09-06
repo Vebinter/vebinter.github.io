@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incident Brief AI — AI-диагностика инцидентов за 10 секунд</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+         background: #f8fafc; color: #1c1e21; overflow-x: hidden; }
+
+  /* ── Header ── */
+  .top { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+         color: #f1f5f9; padding: 1rem 2rem; display: flex; align-items: center; gap: .75rem; }
+  .top .logo { font-size: 1.3rem; font-weight: 700; letter-spacing: -.02em; }
+  .top .logo span { color: #38bdf8; }
+  .top .badge { margin-left: auto; background: #38bdf8; color: #0c4a6e;
+                padding: .2rem .7rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+  .top nav { display: flex; gap: 1.2rem; margin-left: 2rem; }
+  .top nav a { color: #94a3b8; text-decoration: none; font-size: .88rem; transition: color .15s; }
+  .top nav a:hover { color: #fff; }
+
+  .hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          color: #f1f5f9; text-align: center; padding: 4rem 1.5rem 5rem; }
+  .hero h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.15; max-width: 700px;
+             margin: 0 auto .75rem; letter-spacing: -.03em; }
+  .hero h1 span { background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 1.15rem; color: #94a3b8; max-width: 540px; margin: 0 auto 2rem; }
+  .hero .btns { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+  .hero .btn { padding: .75rem 2rem; border-radius: 8px; font-weight: 600; font-size: .95rem;
+               text-decoration: none; transition: all .15s; display: inline-flex; align-items: center; gap: .5rem; }
+  .hero .btn-primary { background: #38bdf8; color: #0c4a6e; }
+  .hero .btn-primary:hover { background: #7dd3fc; transform: translateY(-1px); }
+  .hero .btn-outline { border: 1.5px solid #38bdf8; color: #38bdf8; }
+  .hero .btn-outline:hover { background: rgba(56,189,248,.08); }
+
+  /* ── Features ── */
+  section { padding: 3.5rem 1.5rem; }
+  section h2 { text-align: center; font-size: 1.7rem; font-weight: 700; margin-bottom: .5rem; }
+  section .sub { text-align: center; color: #6b7280; margin-bottom: 2.5rem; font-size: 1rem; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+           gap: 1.25rem; max-width: 860px; margin: 0 auto; }
+  .card { background: #fff; border-radius: 12px; padding: 1.5rem; border: 1px solid #e5e7eb;
+          transition: all .15s; }
+  .card:hover { border-color: #38bdf8; box-shadow: 0 4px 20px rgba(56,189,248,.08); }
+  .card .icon { font-size: 1.8rem; margin-bottom: .6rem; }
+  .card h3 { font-size: 1.05rem; margin-bottom: .4rem; }
+  .card p { font-size: .9rem; color: #6b7280; }
+
+  /* ── How it works ── */
+  .steps { max-width: 600px; margin: 0 auto; }
+  .step { display: flex; gap: 1rem; margin: 1.5rem 0; }
+  .step .num { width: 36px; height: 36px; border-radius: 50%; background: #e0f2fe;
+               display: flex; align-items: center; justify-content: center;
+               font-weight: 700; color: #0369a1; flex-shrink: 0; }
+  .step h4 { font-size: 1rem; margin-bottom: .2rem; }
+  .step p { color: #6b7280; font-size: .9rem; }
+
+  /* ── Pricing ── */
+  .pricing { background: #fff; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 1.25rem; max-width: 860px; margin: 0 auto; }
+  .price-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.75rem;
+                background: #f8fafc; position: relative; transition: all .15s; }
+  .price-card.featured { border-color: #38bdf8; background: #fff; box-shadow: 0 4px 20px rgba(56,189,248,.1); }
+  .price-card.featured::before { content: "Популярный"; position: absolute; top: -.65rem; left: 50%;
+             transform: translateX(-50%); background: #38bdf8; color: #0c4a6e;
+             padding: .1rem .8rem; border-radius: 999px; font-size: .72rem; font-weight: 600; }
+  .price-card .price { font-size: 2rem; font-weight: 800; }
+  .price-card .price sup { font-size: .9rem; font-weight: 400; color: #6b7280; }
+  .price-card .period { color: #6b7280; font-size: .85rem; }
+  .price-card ul { list-style: none; margin: 1rem 0; }
+  .price-card ul li { padding: .35rem 0; font-size: .88rem; }
+  .price-card ul li::before { content: "✓ "; color: #38bdf8; font-weight: 700; }
+  .price-card .btn { display: block; text-align: center; padding: .65rem; border-radius: 8px;
+                     font-weight: 600; font-size: .9rem; text-decoration: none;
+                     transition: all .15s; margin-top: .75rem; }
+  .price-card .btn-outline { border: 1.5px solid #38bdf8; color: #0369a1; }
+  .price-card .btn-outline:hover { background: #e0f2fe; }
+  .price-card .btn-primary { background: #38bdf8; color: #0c4a6e; }
+  .price-card .btn-primary:hover { background: #7dd3fc; }
+
+  /* ── Footer ── */
+  footer { text-align: center; color: #6b7280; font-size: .8rem; padding: 2rem; }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 2rem; }
+    .top nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">🔍 <span>Incident</span> Brief AI</div>
+  <nav>
+    <a href="#features">Возможности</a>
+    <a href="#pricing">Тарифы</a>
+    <a href="#how">Как работает</a>
+  </nav>
+  <div class="badge">v1.0 MVP</div>
+</div>
+
+<div class="hero">
+  <h1>Диагностика инцидентов<br>за <span>10 секунд</span> вместо 45 минут</h1>
+  <p>Slack/Telegram-бот, который по ссылке на GitHub Issue мгновенно выдаёт структурированный brief с вероятной причиной, confidence score и планом действий.</p>
+  <div class="btns">
+    <a href="#pricing" class="btn btn-primary">Начать →</a>
+    <a href="#how" class="btn btn-outline">Как работает</a>
+  </div>
+</div>
+
+<section id="features">
+  <h2>Что умеет бот</h2>
+  <p class="sub">Одно нажатие — и у команды есть гипотеза, шаги и готовый ответ</p>
+  <div class="grid3">
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h3>Вероятная причина</h3>
+      <p>GigaChat анализирует стектрейс и свежие коммиты — выдаёт гипотезу с обоснованием.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h3>Confidence Score</h3>
+      <p>Визуальный индикатор (🟢 высокая / 🟡 средняя / 🔴 низкая) плюс объяснение, почему такая уверенность.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔗</div>
+      <h3>Привязка к коммитам</h3>
+      <p>Сканирует коммиты за 24ч, находит совпадения с файлами стектрейса — показывает, что могло сломаться.</p>
+    </div>
+    <div class="card">
+      <div class="icon">✅</div>
+      <h3>Топ-3 шага</h3>
+      <p>Конкретные действия для инженера: что проверить, куда посмотреть, какие тесты запустить.</p>
+    </div>
+    <div class="card">
+      <div class="icon">💬</div>
+      <h3>Черновик ответа</h3>
+      <p>Готовый текст для стейкхолдеров — не нужно тратить время на формулировки во время инцидента.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📱</div>
+      <h3>Telegram / Slack</h3>
+      <p>Ответ приходит прямо в чат команды. Поддерживаются несколько ссылок в одном запросе.</p>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:#fff;border-top:1px solid #e5e7eb">
+  <h2>Как это работает</h2>
+  <p class="sub">Три шага — и у вас диагноз</p>
+  <div class="steps">
+    <div class="step">
+      <div class="num">1</div>
+      <div><h4>Кидаете ссылку</h4>
+      <p>Напишите боту: <code>/incident https://github.com/owner/repo/issues/42</code> (или несколько ссылок сразу).</p></div>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <div><h4>Бот анализирует</h4>
+      <p>Читает Issue, получает стектрейс, сканирует коммиты/PR за 24ч, находит совпадения, отправляет в GigaChat.</p></div>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <div><h4>Получаете brief</h4>
+      <p>Причина, уверенность, связанные коммиты, топ-3 шага и черновик ответа — в вашем Telegram/Slack.</p></div>
+    </div>
+  </div>
+
+  <div style="max-width:600px;margin:2rem auto 0;background:#f0f4f8;border-radius:10px;padding:1rem 1.25rem">
+    <p style="font-size:.88rem;color:#475569;font-family:ui-monospace,monospace">
+    🔍 <b style="color:#0369a1">Incident Brief</b><br>
+    🎯 Причина: Ошибка в модуле авторизации, файл login.py (последний коммит @dev<br>
+    🟡 Уверенность: MEDIUM · 2 совпадения с коммитами<br>
+    ✅ Шаги: 1. Проверить login.py · 2. Запустить тесты · 3. Ручной тест<br>
+    💬 Стейкхолдерам: Инцидент в модуле auth, ведём диагностику…
+    </p>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <h2>Тарифы</h2>
+  <p class="sub">Подходит для команд любого размера. Первые 10 brief — бесплатно.</p>
+  <div class="price-grid">
+    <div class="price-card">
+      <div class="price">$0 <sup>бесплатно</sup></div>
+      <div class="period">навсегда для ознакомления</div>
+      <ul>
+        <li>10 brief / месяц</li>
+        <li>GitHub Issues</li>
+        <li>Telegram-бот</li>
+        <li>Без истории</li>
+      </ul>
+      <a href="#" class="btn btn-outline">Попробовать</a>
+    </div>
+
+    <div class="price-card featured">
+      <div class="price">$10 <sup>/ пользователь / мес</sup></div>
+      <div class="period">для команд 5–80 человек</div>
+      <ul>
+        <li>100 brief / месяц</li>
+        <li>GitHub Issues + Sentry</li>
+        <li>Telegram + Slack</li>
+        <li>История 30 дней</li>
+        <li>Приоритетная поддержка</li>
+      </ul>
+      <a href="#pay" class="btn btn-primary">Выбрать Team →</a>
+    </div>
+
+    <div class="price-card">
+      <div class="price">$25 <sup>/ пользователь / мес</sup></div>
+      <div class="period">для крупных организаций</div>
+      <ul>
+        <li>Безлимит brief</li>
+        <li>Любые интеграции</li>
+        <li>Self-hosted / on-prem</li>
+        <li>SSO, RBAC, Audit Log</li>
+        <li>SLA 99.9%</li>
+      </ul>
+      <a href="#" class="btn btn-outline">Связаться</a>
+    </div>
+  </div>
+</section>
+
+<section id="pay" style="background:#fff;border-top:1px solid #e5e7eb">
+  <h2>Как оплатить</h2>
+  <p class="sub">Ручная оплата для резидентов РФ. После оплаты мы активируем ваш тариф в течение 24ч.</p>
+  <div style="max-width:600px;margin:0 auto;background:#f0f4f8;border-radius:12px;padding:1.5rem 2rem">
+
+    <div style="margin-bottom:1.5rem">
+      <h3 style="font-size:1rem;margin-bottom:.6rem">💳 Оплата на карту Сбер</h3>
+      <p style="font-family:ui-monospace,monospace;font-size:1.2rem;font-weight:700;background:#fff;padding:.6rem 1rem;border-radius:8px;border:1px solid #e5e7eb;display:inline-block">
+        2204 1801 2541 2346
+      </p>
+      <p style="font-size:.85rem;color:#6b7280;margin-top:.3rem">Получатель: Вячеслав Б.</p>
+    </div>
+
+    <div style="margin-bottom:1.5rem">
+      <h3 style="font-size:1rem;margin-bottom:.3rem">📄 ЮMoney</h3>
+      <p style="font-size:.9rem;color:#475569">Кошелёк: <code style="background:#fff;padding:.2rem .5rem;border-radius:4px">4100119621488233</code></p>
+      <p style="font-size:.85rem;color:#6b7280;margin-top:.3rem">(уточнить при заказе)</p>
+    </div>
+
+    <div style="margin-bottom:1.5rem">
+      <h3 style="font-size:1rem;margin-bottom:.3rem">📧 Договор</h3>
+      <p style="font-size:.9rem;color:#475569">Напишите на почту для договора и счета: <a href="mailto:softprogram1001@gmail.com" style="color:#0369a1">softprogram1001@gmail.com</a></p>
+    </div>
+
+    <div style="background:#e0f2fe;border-radius:8px;padding:.8rem 1rem;font-size:.85rem;color:#0369a1">
+      <b>Порядок:</b> Выбираете тариф → пишете на почту → получаете договор → оплачиваете → мы активируем доступ. Всё официально, с закрывающими документами.
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  © 2026 vebinter · Proprietary · Все права защищены<br>
+  Built with Yandex Cloud Functions + GigaChat + Telegram
+</footer>
+
+</body>
+</html>
