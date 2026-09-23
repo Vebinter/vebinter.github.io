@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incident Brief AI — Дашборд</title>
+<style>
+  :root {
+    --bg: #101418; --panel: #1a2128; --panel2: #232c35;
+    --ink: #e6edf3; --muted: #8b98a5;
+    --accent: #3ddad7; --accent-soft: #12312f;
+    --amber: #f0b34b; --red: #f26d6d; --green: #4ade80;
+    --line: #2a343d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+  header h1 { font-size: 1.8rem; line-height: 1.2; margin: 0 0 .3rem; letter-spacing: -.02em; }
+  header .bar { display: flex; align-items: center; gap: .6rem; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green);
+         box-shadow: 0 0 10px var(--green); }
+  .meta { color: var(--muted); font-size: .85rem; }
+  .tldr { background: var(--accent-soft); border-left: 4px solid var(--accent);
+          padding: .9rem 1.1rem; border-radius: 0 8px 8px 0; margin: 1.5rem 0; }
+  .tldr b { color: var(--accent); }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: .75rem; margin: 1.5rem 0; }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+         padding: .85rem 1rem; }
+  .kpi b { display: block; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+  .kpi span { color: var(--muted); font-size: .78rem; }
+  section { margin: 2.2rem 0; }
+  h2 { font-size: 1.1rem; border-bottom: 1px solid var(--line);
+       padding-bottom: .4rem; margin: 0 0 .9rem; color: var(--accent); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line);
+           border-radius: 10px; padding: 1rem 1.1rem; }
+  .bars .bar-row { display: grid; grid-template-columns: 90px 1fr 44px; gap: .6rem;
+                   align-items: center; margin: .5rem 0; }
+  .bars .bar-row .lbl { color: var(--muted); font-size: .85rem; }
+  .bars .track { background: var(--panel2); border-radius: 3px; height: .8em; }
+  .bars .fill { height: .8em; border-radius: 3px; }
+  .bars .val { font-variant-numeric: tabular-nums; text-align: right; color: var(--ink); }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+  th, td { padding: .5rem .6rem; border-bottom: 1px solid var(--line); text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tag { display: inline-block; padding: .1rem .5rem; border-radius: 999px;
+         font-size: .75rem; font-weight: 600; }
+  .tag.high { background: rgba(74,222,128,.15); color: var(--green); }
+  .tag.med  { background: rgba(240,179,75,.15); color: var(--amber); }
+  .tag.low  { background: rgba(242,109,109,.15); color: var(--red); }
+  .tag.sev1 { background: rgba(242,109,109,.18); color: var(--red); }
+  .tag.sev2 { background: rgba(240,179,75,.15);  color: var(--amber); }
+  .tag.sev3 { background: rgba(61,218,215,.14);  color: var(--accent); }
+  .tick { font-size: 11px; fill: var(--muted); }
+  .lbl  { font-size: 11px; fill: var(--muted); }
+  .donut-legend { display: flex; gap: 1rem; justify-content: center; margin-top: .6rem;
+                  font-size: .85rem; }
+  .donut-legend .sw { display:inline-block; width:10px; height:10px; border-radius:2px;
+                      margin-right:.35rem; vertical-align: -1px; }
+  footer { color: var(--muted); font-size: .8rem; border-top: 1px solid var(--line);
+           margin-top: 3rem; padding-top: .8rem; }
+  .warn { color: var(--amber); }
+  @media print {
+    body { background: #fff; color: #111; }
+    main { max-width: none; padding: 0; }
+    .kpi, table, svg, .panel { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="bar">
+      <div class="dot"></div>
+      <h1>Incident Brief AI — дашборд</h1>
+    </div>
+    <p class="meta">Период: последние 7 дней · Среда: Yandex Cloud Functions + GigaChat (VM‑прокси) · Сформировано 06.09.2026</p>
+  </header>
+
+  <div class="tldr">
+    <b>Главное.</b> Бот работает и выдаёт brief по GitHub Issue за ~5,8&nbsp;с (GigaChat через VM-прокси 84.252.128.44).
+    За 7 дней — 21&nbsp;инцидент, 90&nbsp;% ответов успешные, медиана уверенности — medium.
+    Показанные ниже данные <span class="warn">демонстрационные</span>: реальная история накопится после первого продакшн-периода,
+    структура и графики при этом не изменятся.
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><b>21</b><span>инцидентов за 7 дней</span></div>
+    <div class="kpi"><b>5,8&nbsp;с</b><span>среднее время brief</span></div>
+    <div class="kpi"><b>90&nbsp;%</b><span>успешных ответов (19 из 21)</span></div>
+    <div class="kpi"><b>132</b><span>вызовов функции за 7 дней</span></div>
+    <div class="kpi"><b>5</b><span>коммитов за 24&nbsp;ч</span></div>
+    <div class="kpi"><b>medium</b><span>медиана confidence</span></div>
+  </div>
+
+  <section>
+    <h2>Инциденты по дням</h2>
+    <div class="panel">
+      <svg viewBox="0 0 640 220" role="img" aria-label="Инциденты по дням недели: Пн 12, Вт 18, Ср 9, Чт 21, Пт 14, Сб 26, Вс 18">
+        <line x1="60" y1="190" x2="620" y2="190" stroke="var(--line)"/>
+        <rect x="76"  y="107" width="48" height="83"  fill="var(--accent)"/>
+        <rect x="156" y="65"  width="48" height="125" fill="var(--accent)"/>
+        <rect x="236" y="128" width="48" height="62"  fill="var(--accent)"/>
+        <rect x="316" y="45"  width="48" height="145" fill="var(--accent)"/>
+        <rect x="396" y="93"  width="48" height="97"  fill="var(--accent)"/>
+        <rect x="476" y="10"  width="48" height="180" fill="var(--accent)"/>
+        <rect x="556" y="65"  width="48" height="125" fill="var(--accent)"/>
+        <text x="100" y="99"  text-anchor="middle" class="lbl">12</text>
+        <text x="180" y="57"  text-anchor="middle" class="lbl">18</text>
+        <text x="260" y="120" text-anchor="middle" class="lbl">9</text>
+        <text x="340" y="37"  text-anchor="middle" class="lbl">21</text>
+        <text x="420" y="85"  text-anchor="middle" class="lbl">14</text>
+        <text x="500" y="2"   text-anchor="middle" class="lbl">26</text>
+        <text x="580" y="57"  text-anchor="middle" class="lbl">18</text>
+        <text x="100" y="208" text-anchor="middle" class="tick">Пн</text>
+        <text x="180" y="208" text-anchor="middle" class="tick">Вт</text>
+        <text x="260" y="208" text-anchor="middle" class="tick">Ср</text>
+        <text x="340" y="208" text-anchor="middle" class="tick">Чт</text>
+        <text x="420" y="208" text-anchor="middle" class="tick">Пт</text>
+        <text x="500" y="208" text-anchor="middle" class="tick">Сб</text>
+        <text x="580" y="208" text-anchor="middle" class="tick">Вс</text>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>Время ответа от GigaChat (мс)</h2>
+    <div class="panel">
+      <svg viewBox="0 0 640 220" role="img" aria-label="Время ответа по последним brief: от 5,2 до 14,2 секунды">
+        <line x1="60" y1="190" x2="620" y2="190" stroke="var(--line)"/>
+        <line x1="60" y1="10"  x2="620" y2="10"  stroke="var(--line)" stroke-dasharray="4 4"/>
+        <polyline points="60,124 122,112 184,50 247,10 309,124 371,113 433,84 496,112 558,123 620,112"
+                  fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+        <circle cx="247" cy="10" r="4" fill="var(--amber)"/>
+        <circle cx="60"  cy="124" r="3.5" fill="var(--accent)"/>
+        <circle cx="620" cy="112" r="3.5" fill="var(--accent)"/>
+        <text x="247" y="207" text-anchor="middle" class="tick">пик 14 236 мс</text>
+        <text x="60"  y="207" text-anchor="start"  class="tick">5 205 мс</text>
+        <text x="620" y="207" text-anchor="end"    class="tick">6 150 мс</text>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>Распределение уверенности и серьёзность</h2>
+    <div class="grid2">
+      <div class="panel">
+        <div class="bars">
+          <div class="bar-row">
+            <span class="lbl">High</span>
+            <div class="track"><div class="fill" style="width:44%; background:var(--green)"></div></div>
+            <span class="val">4</span>
+          </div>
+          <div class="bar-row">
+            <span class="lbl">Medium</span>
+            <div class="track"><div class="fill" style="width:100%; background:var(--amber)"></div></div>
+            <span class="val">9</span>
+          </div>
+          <div class="bar-row">
+            <span class="lbl">Low</span>
+            <div class="track"><div class="fill" style="width:89%; background:var(--red)"></div></div>
+            <span class="val">8</span>
+          </div>
+        </div>
+        <p class="meta" style="margin:.7rem 0 0">Большинство инцидентов — с уверенностью medium: совпадение стектрейса с коммитами частичное.</p>
+      </div>
+      <div class="panel" style="text-align:center">
+        <svg viewBox="0 0 100 100" width="150" height="150" role="img" aria-label="Серьёзность: SEV1 3, SEV2 11, SEV3 7">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--panel2)" stroke-width="16"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--red)"    stroke-width="16"
+                  stroke-dasharray="35.9 215.4" transform="rotate(218.6 50 50)"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--amber)"  stroke-width="16"
+                  stroke-dasharray="131.7 119.6" transform="rotate(30 50 50)"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent)" stroke-width="16"
+                  stroke-dasharray="83.7 167.6" transform="rotate(-90 50 50)"/>
+          <text x="50" y="47" text-anchor="middle" fill="var(--ink)" font-size="17" font-weight="700">21</text>
+          <text x="50" y="62" text-anchor="middle" fill="var(--muted)" font-size="8">инцидентов</text>
+        </svg>
+        <div class="donut-legend">
+          <span><span class="sw" style="background:var(--red)"></span>SEV1 · 3</span>
+          <span><span class="sw" style="background:var(--amber)"></span>SEV2 · 11</span>
+          <span><span class="sw" style="background:var(--accent)"></span>SEV3 · 7</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>История запросов</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr><th>Дата</th><th>Issue</th><th>Уверенность</th><th>Время</th><th>Статус</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>06.09.2026 03:13</td><td>vebinter/incident-brief-ai #2</td><td><span class="tag low">low</span></td><td class="num">6,2&nbsp;с</td><td class="num">200</td></tr>
+          <tr><td>06.09.2026 02:03</td><td>vebinter/incident-brief-ai #2</td><td><span class="tag low">low</span></td><td class="num">5,2&nbsp;с</td><td class="num">200</td></tr>
+          <tr><td>06.09.2026 01:00</td><td>vebinter/incident-brief-ai #2</td><td><span class="tag low">low</span></td><td class="num">14,2&nbsp;с</td><td class="num">200</td></tr>
+          <tr><td>05.09.2026 23:34</td><td>vebinter/incident-brief-ai #2</td><td><span class="tag med">medium</span></td><td class="num">10,9&nbsp;с</td><td class="num">200</td></tr>
+          <tr><td>05.09.2026 16:13</td><td>vebinter/incident-brief-ai #1</td><td><span class="tag med">medium</span></td><td class="num">5,3&nbsp;с</td><td class="num">200</td></tr>
+          <tr><td>05.09.2026 15:02</td><td>demo/checkout #118</td><td><span class="tag high">high</span></td><td class="num">4,9&nbsp;с</td><td class="num">200</td></tr>
+          <tr><td>05.09.2026 12:41</td><td>demo/payments #342</td><td><span class="tag high">high</span></td><td class="num">3,8&nbsp;с</td><td class="num">200</td></tr>
+          <tr><td>04.09.2026 18:20</td><td>demo/api-gateway #57</td><td><span class="tag med">medium</span></td><td class="num">5,6&nbsp;с</td><td class="num">200</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="meta" style="margin:.6rem 0 0">Строки с 05.09 вниз — демонстрационные. Реальные записи появятся автоматически после запуска Telegram-бота.</p>
+  </section>
+
+  <section>
+    <h2>Компоненты системы</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Компонент</th><th>Статус</th><th>Примечание</th></tr></thead>
+        <tbody>
+          <tr><td>Yandex Cloud Function</td><td class="num" style="color:var(--green)">✅ работает</td><td>handler.handler, Python 3.14</td></tr>
+          <tr><td>VM-прокси GigaChat</td><td class="num" style="color:var(--green)">✅ работает</td><td>84.252.128.44:8080, Flask</td></tr>
+          <tr><td>GitHub API</td><td class="num" style="color:var(--green)">✅ настроен</td><td>токен + issue #2</td></tr>
+          <tr><td>Telegram-бот</td><td class="num" style="color:var(--amber)">⏳ ждёт</td><td>токен через @BotFather дома</td></tr>
+          <tr><td>Сохранение истории</td><td class="num" style="color:var(--amber)">⏳ план</td><td>после первого периода</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Сформировано 06.09.2026 · Данные демонстрационные, кроме строк реальных тестов Cloud Function ·
+    Архитектура: Yandex Cloud Functions → VM-прокси (GigaChat) → Telegram · © 2026 vebinter · Proprietary
+  </footer>
+</main>
+</body>
+</html>
